@@ -3,6 +3,7 @@
 
 #include "algorithms/kinematic/6dof_kinematic.h"
 #include "actuators/ctrl_step/ctrl_step.hpp"
+#include <string> /*Add by zhbi98*/
 
 #define ALL 0
 

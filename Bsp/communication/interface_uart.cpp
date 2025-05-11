@@ -56,12 +56,12 @@ private:
     uint8_t tx_buf_[UART_TX_BUFFER_SIZE];
 } uart4_stream_output;
 
-class UART5Sender : public StreamSink
+class UART2Sender : public StreamSink
 {
 public:
-    UART5Sender()
+    UART2Sender()
     {
-        channelType = CHANNEL_TYPE_UART5;
+        channelType = CHANNEL_TYPE_UART2;
     }
 
     int process_bytes(const uint8_t* buffer, size_t length, size_t* processed_bytes) override
@@ -73,11 +73,11 @@ public:
             // wait for USB interface to become ready
             // TODO: implement ring buffer to get a more continuous stream of data
             // if (osSemaphoreWait(sem_uart_dma, deadline_to_timeout(deadline_ms)) != osOK)
-            if (osSemaphoreAcquire(sem_uart5_dma, PROTOCOL_SERVER_TIMEOUT_MS) != osOK)
+            if (osSemaphoreAcquire(sem_uart2_dma, PROTOCOL_SERVER_TIMEOUT_MS) != osOK)
                 return -1;
             // transmit chunk
             memcpy(tx_buf_, buffer, chunk);
-            if (HAL_UART_Transmit_DMA(&huart5, tx_buf_, chunk) != HAL_OK)
+            if (HAL_UART_Transmit_DMA(&huart2, tx_buf_, chunk) != HAL_OK)
                 return -1;
             buffer += chunk;
             length -= chunk;
@@ -92,17 +92,17 @@ public:
 
 private:
     uint8_t tx_buf_[UART_TX_BUFFER_SIZE];
-} uart5_stream_output;
+} uart2_stream_output;
 
 StreamSink* uart4StreamOutputPtr = &uart4_stream_output;
 StreamBasedPacketSink uart4_packet_output(uart4_stream_output);
 BidirectionalPacketBasedChannel uart4_channel(uart4_packet_output);
 StreamToPacketSegmenter uart4_stream_input(uart4_channel);
 
-StreamSink* uart5StreamOutputPtr = &uart5_stream_output;
-StreamBasedPacketSink uart5_packet_output(uart5_stream_output);
-BidirectionalPacketBasedChannel uart5_channel(uart5_packet_output);
-StreamToPacketSegmenter uart5_stream_input(uart5_channel);
+StreamSink* uart2StreamOutputPtr = &uart2_stream_output;
+StreamBasedPacketSink uart2_packet_output(uart2_stream_output);
+BidirectionalPacketBasedChannel uart2_channel(uart2_packet_output);
+StreamToPacketSegmenter uart2_stream_input(uart2_channel);
 
 static void UartServerTask(void* ctx)
 {
@@ -142,32 +142,32 @@ static void UartServerTask(void* ctx)
 
 
         // Check for UART errors and restart recieve DMA transfer if required
-        if (huart5.ErrorCode != HAL_UART_ERROR_NONE)
+        if (huart2.ErrorCode != HAL_UART_ERROR_NONE)
         {
-            HAL_UART_AbortReceive(&huart5);
-            HAL_UART_Receive_DMA(&huart5, dma_rx_buffer[1], sizeof(dma_rx_buffer[1]));
+            HAL_UART_AbortReceive(&huart2);
+            HAL_UART_Receive_DMA(&huart2, dma_rx_buffer[1], sizeof(dma_rx_buffer[1]));
         }
         // Fetch the circular buffer "write pointer", where it would write next
-        new_rcv_idx = UART_RX_BUFFER_SIZE - huart5.hdmarx->Instance->NDTR;
+        new_rcv_idx = UART_RX_BUFFER_SIZE - huart2.hdmarx->Instance->NDTR;
 
         // deadline_ms = timeout_to_deadline(PROTOCOL_SERVER_TIMEOUT_MS);
         // Process bytes in one or two chunks (two in case there was a wrap)
         if (new_rcv_idx < dma_last_rcv_idx[1])
         {
-            uart4_stream_input.process_bytes(dma_rx_buffer[1] + dma_last_rcv_idx[1],
+            uart2_stream_input.process_bytes(dma_rx_buffer[1] + dma_last_rcv_idx[1],
                                              UART_RX_BUFFER_SIZE - dma_last_rcv_idx[1],
                                              nullptr); // TODO: use process_all
             ASCII_protocol_parse_stream(dma_rx_buffer[1] + dma_last_rcv_idx[1],
-                                        UART_RX_BUFFER_SIZE - dma_last_rcv_idx[1], uart5_stream_output);
+                                        UART_RX_BUFFER_SIZE - dma_last_rcv_idx[1], uart2_stream_output);
             dma_last_rcv_idx[1] = 0;
         }
         if (new_rcv_idx > dma_last_rcv_idx[1])
         {
-            uart4_stream_input.process_bytes(dma_rx_buffer[1] + dma_last_rcv_idx[1],
+            uart2_stream_input.process_bytes(dma_rx_buffer[1] + dma_last_rcv_idx[1],
                                              new_rcv_idx - dma_last_rcv_idx[1],
                                              nullptr); // TODO: use process_all
             ASCII_protocol_parse_stream(dma_rx_buffer[1] + dma_last_rcv_idx[1],
-                                        new_rcv_idx - dma_last_rcv_idx[1], uart5_stream_output);
+                                        new_rcv_idx - dma_last_rcv_idx[1], uart2_stream_output);
             dma_last_rcv_idx[1] = new_rcv_idx;
         }
 
@@ -190,8 +190,8 @@ void StartUartServer()
     HAL_UART_Receive_DMA(&huart4, dma_rx_buffer[0], sizeof(dma_rx_buffer[0]));
     dma_last_rcv_idx[0] = UART_RX_BUFFER_SIZE - huart4.hdmarx->Instance->NDTR;
 
-    HAL_UART_Receive_DMA(&huart5, dma_rx_buffer[1], sizeof(dma_rx_buffer[1]));
-    dma_last_rcv_idx[1] = UART_RX_BUFFER_SIZE - huart5.hdmarx->Instance->NDTR;
+    HAL_UART_Receive_DMA(&huart2, dma_rx_buffer[1], sizeof(dma_rx_buffer[1]));
+    dma_last_rcv_idx[1] = UART_RX_BUFFER_SIZE - huart2.hdmarx->Instance->NDTR;
 
     // Start UART communication thread
     uartServerTaskHandle = osThreadNew(UartServerTask, nullptr, &uartServerTask_attributes);
@@ -201,6 +201,6 @@ void HAL_UART_TxCpltCallback(UART_HandleTypeDef* huart)
 {
     if (huart->Instance == UART4)
         osSemaphoreRelease(sem_uart4_dma);
-    else if (huart->Instance == UART5)
-        osSemaphoreRelease(sem_uart5_dma);
+    else if (huart->Instance == USART2)
+        osSemaphoreRelease(sem_uart2_dma);
 }

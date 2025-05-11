@@ -8,7 +8,7 @@ extern "C" {
 // List of semaphores
 extern osSemaphoreId sem_usb_irq;
 extern osSemaphoreId sem_uart4_dma;
-extern osSemaphoreId sem_uart5_dma;
+extern osSemaphoreId sem_uart2_dma;
 extern osSemaphoreId sem_usb_rx;
 extern osSemaphoreId sem_usb_tx;
 extern osSemaphoreId sem_can1_tx;

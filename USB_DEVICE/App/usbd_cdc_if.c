@@ -277,6 +277,8 @@ static int8_t CDC_Control_FS(uint8_t cmd, uint8_t* pbuf, uint16_t length)
     /* USER CODE END 5 */
 }
 
+static GPIO_PinState _led_state = GPIO_PIN_SET;
+
 /**
   * @brief  Data received over USB OUT endpoint are sent over CDC interface
   *         through this function.
@@ -295,6 +297,10 @@ static int8_t CDC_Receive_FS(uint8_t* Buf, uint32_t *Len, uint8_t endpoint_pair)
 {
     /* USER CODE BEGIN 6 */
     usb_rx_process_packet(Buf, *Len, endpoint_pair);
+
+    /*Configure GPIO pin Output Level */
+    HAL_GPIO_WritePin(GPIOC, GPIO_PIN_6, _led_state);
+    _led_state = !_led_state;
 
     return (USBD_OK);
     /* USER CODE END 6 */

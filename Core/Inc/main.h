@@ -58,13 +58,13 @@ void Error_Handler(void);
 /* USER CODE END EFP */
 
 /* Private defines -----------------------------------------------------------*/
-#define KEY_Pin GPIO_PIN_13
+#define KEY_Pin GPIO_PIN_7
 #define KEY_GPIO_Port GPIOC
 #define OLED_I2C2_SCL_Pin GPIO_PIN_10
 #define OLED_I2C2_SCL_GPIO_Port GPIOB
 #define OLED_I2C2_SDA_Pin GPIO_PIN_11
 #define OLED_I2C2_SDA_GPIO_Port GPIOB
-#define LED_Pin GPIO_PIN_8
+#define LED_Pin GPIO_PIN_6
 #define LED_GPIO_Port GPIOC
 #define IMU_I2C1_SCL_Pin GPIO_PIN_6
 #define IMU_I2C1_SCL_GPIO_Port GPIOB

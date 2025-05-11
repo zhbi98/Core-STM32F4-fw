@@ -46,7 +46,7 @@ void OnUsbAsciiCmd(const char* _cmd, size_t _len, StreamSink &_responseChannel)
             Respond(_responseChannel, "Set command mode to [%lu]", mode);
         } else
             Respond(_responseChannel, "ok");
-    } else if (_cmd[0] == '>' || _cmd[0] == '@')
+    } else if (_cmd[0] == '&'/*'>'*/ || _cmd[0] == '@')
     {
         uint32_t freeSize = dummy.commandHandler.Push(_cmd);
         Respond(_responseChannel, "%d", freeSize);
@@ -108,7 +108,7 @@ void OnUart4AsciiCmd(const char* _cmd, size_t _len, StreamSink &_responseChannel
 }
 
 
-void OnUart5AsciiCmd(const char* _cmd, size_t _len, StreamSink &_responseChannel)
+void OnUart2AsciiCmd(const char* _cmd, size_t _len, StreamSink &_responseChannel)
 {
     /*---------------------------- ↓ Add Your CMDs Here ↓ -----------------------------*/
 

@@ -6,8 +6,10 @@
 #include "u8g2.h"
 #include "soft_i2c.h"
 
-extern I2C_HandleTypeDef *U8G2_I2C_HANDLE;
-extern SPI_HandleTypeDef *U8G2_SPI_HANDLE;
+/*extern I2C_HandleTypeDef *U8G2_I2C_HANDLE;
+extern SPI_HandleTypeDef *U8G2_SPI_HANDLE;*/
+extern SPI_HandleTypeDef * _SPI_DEV; /**SPI Interface*/
+extern I2C_HandleTypeDef * _I2C_DEV; /**I2C Interface*/
 
 class U8G2 : public Print
 {
@@ -105,7 +107,7 @@ public:
 
     bool Init()
     {
-        if (U8G2_I2C_HANDLE->Instance == I2C_SOFT)
+        if (_I2C_DEV->Instance == I2C_SOFT)
             Soft_I2C_Init();
 
         /* note: call to u8x8_utf8_init is not required here, this is done in the setup procedures before */
@@ -579,15 +581,27 @@ public:
     }
 };
 
+/**********************
+ * GLOBAL PROTOTYPES
+ **********************/
+
+extern "C" uint8_t u8x8_stm32_gpio_and_delay(u8x8_t *u8x8, uint8_t msg, uint8_t arg_int, void *arg_ptr);
+extern "C" uint8_t u8x8_byte_stm32_hw_spi(u8x8_t *u8x8, uint8_t msg, uint8_t arg_int, void *arg_ptr);
+
+/**********************
+ * GLOBAL PROTOTYPES
+ **********************/
+
 class SSD1306 : public U8G2
 {
 private:
 
 public:
-    explicit SSD1306(I2C_HandleTypeDef *_hi2c, const u8g2_cb_t *rotation = U8G2_R3) : U8G2()
+    explicit SSD1306(I2C_HandleTypeDef *_hi2c, const u8g2_cb_t *rotation = U8G2_R2) : U8G2()
     {
-        U8G2_I2C_HANDLE = _hi2c;
-        u8g2_Setup_ssd1306_i2c_128x80_noname_f(&u8g2, rotation, u8x8_byte_stm32_hw_i2c, u8x8_stm32_gpio_and_delay);
+        _I2C_DEV = _hi2c;
+        /*u8g2_Setup_ssd1306_i2c_128x80_noname_f(&u8g2, rotation, u8x8_byte_stm32_hw_i2c, u8x8_stm32_gpio_and_delay);*/
+        u8g2_Setup_ssd1312_128x64_noname_f(&u8g2, rotation, u8x8_byte_stm32_hw_spi, u8x8_stm32_gpio_and_delay);
     }
 };
 

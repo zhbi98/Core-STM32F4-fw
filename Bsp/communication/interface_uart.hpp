@@ -6,7 +6,7 @@
 #include "fibre/protocol.hpp"
 
 extern StreamSink *uart4StreamOutputPtr;
-extern StreamSink *uart5StreamOutputPtr;
+extern StreamSink *uart2StreamOutputPtr;
 
 extern "C" {
 #endif

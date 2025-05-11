@@ -13,6 +13,7 @@ see protocol.md for the protocol specification
 #include <cmath>
 //#include <stdint.h>
 #include <string.h>
+#include <cstdio> /*Add by zhbi98*/
 #include "crc.hpp"
 #include "cpp_utils.hpp"
 
@@ -159,7 +160,7 @@ public:
     {
         CHANNEL_TYPE_USB,
         CHANNEL_TYPE_UART4,
-        CHANNEL_TYPE_UART5
+        CHANNEL_TYPE_UART2
     };
 
     ChannelType_t channelType;

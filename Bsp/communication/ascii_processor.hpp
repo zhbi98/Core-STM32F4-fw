@@ -19,7 +19,7 @@
 void ASCII_protocol_parse_stream(const uint8_t* buffer, size_t len, StreamSink& response_channel);
 void OnUsbAsciiCmd(const char* _cmd, size_t _len, StreamSink& _responseChannel);
 void OnUart4AsciiCmd(const char* _cmd, size_t _len, StreamSink& _responseChannel);
-void OnUart5AsciiCmd(const char* _cmd, size_t _len, StreamSink& _responseChannel);
+void OnUart2AsciiCmd(const char* _cmd, size_t _len, StreamSink& _responseChannel);
 
 // Function to send messages back through specific channel (UART or USB-VCP).
 // Use this function instead of printf because printf will send messages over ALL CHANNEL.

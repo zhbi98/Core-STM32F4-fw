@@ -4,7 +4,7 @@
 // On-board Screen, can choose from hi2c2 or hi2c0(soft i2c)
 SSD1306 oled(&hi2c0);
 // On-board Sensor, used hi2c1
-MPU6050 mpu6050(&hi2c1);
+MPU6050 mpu6050(&hi2c3);
 // 5 User-Timers, can choose from htim7/htim10/htim11/htim13/htim14
 Timer timerCtrlLoop(&htim7, 200);
 // 2x2-channel PWMs, used htim9 & htim12, each has 2-channel outputs
@@ -71,36 +71,36 @@ void ThreadOledUpdate(void* argument)
 
         oled.clearBuffer();
         oled.setFont(u8g2_font_5x8_tr);
-        oled.setCursor(0, 10);
+        oled.setCursor(0, 8);
         oled.printf("IMU:%.3f/%.3f", mpu6050.data.ax, mpu6050.data.ay);
-        oled.setCursor(85, 10);
+        oled.setCursor(85, 8);
         oled.printf("| FPS:%lu", 1000000 / (micros() - t));
         t = micros();
 
-        oled.drawBox(0, 15, 128, 3);
-        oled.setCursor(0, 30);
+        oled.drawBox(0, 11, 128, 3);
+        oled.setCursor(0, 22);
         oled.printf(">%3d|%3d|%3d|%3d|%3d|%3d",
                     (int) roundf(dummy.currentJoints.a[0]), (int) roundf(dummy.currentJoints.a[1]),
                     (int) roundf(dummy.currentJoints.a[2]), (int) roundf(dummy.currentJoints.a[3]),
                     (int) roundf(dummy.currentJoints.a[4]), (int) roundf(dummy.currentJoints.a[5]));
 
-        oled.drawBox(40, 35, 128, 24);
+        oled.drawBox(40, 25, 128, 24);
         oled.setFont(u8g2_font_6x12_tr);
         oled.setDrawColor(0);
-        oled.setCursor(42, 45);
+        oled.setCursor(42, 35);
         oled.printf("%4d|%4d|%4d", (int) roundf(dummy.currentPose6D.X),
                     (int) roundf(dummy.currentPose6D.Y), (int) roundf(dummy.currentPose6D.Z));
-        oled.setCursor(42, 56);
+        oled.setCursor(42, 46);
         oled.printf("%4d|%4d|%4d", (int) roundf(dummy.currentPose6D.A),
                     (int) roundf(dummy.currentPose6D.B), (int) roundf(dummy.currentPose6D.C));
         oled.setDrawColor(1);
-        oled.setCursor(0, 45);
+        oled.setCursor(0, 35);
         oled.printf("[XYZ]:");
-        oled.setCursor(0, 56);
+        oled.setCursor(0, 46);
         oled.printf("[ABC]:");
 
         oled.setFont(u8g2_font_10x20_tr);
-        oled.setCursor(0, 78);
+        oled.setCursor(0, 64);
         if (dummy.IsEnabled())
         {
             for (int i = 1; i <= 6; i++)
@@ -113,6 +113,9 @@ void ThreadOledUpdate(void* argument)
         }
 
         oled.sendBuffer();
+
+        /**·ÀÖ¹ STM32 Ó²¼þ I2C I2C_WaitOnMasterAddressFlagUntilTimeout ËÀËøÔÚ BUSY ×´Ì¬*/
+        vTaskDelay(10);
     }
 }
 
@@ -147,7 +150,7 @@ void Main(void)
 
     // Init OLED 128x80.
     oled.Init();
-    pwm.Start();
+    /*pwm.Start();*/ /*µÆ»·ºôÎüµÆ¿ØÖÆ*/
 
     // Init & Run User Threads.
     const osThreadAttr_t controlLoopTask_attributes = {
@@ -178,6 +181,6 @@ void Main(void)
     timerCtrlLoop.Start();
 
     // System started, light switch-led up.
-    Respond(*uart4StreamOutputPtr, "[sys] Heap remain: %d Bytes\n", xPortGetMinimumEverFreeHeapSize());
-    pwm.SetDuty(PWM::CH_A1, 0.5);
+    Respond(*uart2StreamOutputPtr, "[sys] Heap remain: %d Bytes\n", xPortGetMinimumEverFreeHeapSize());
+    /*pwm.SetDuty(PWM::CH_A1, 0.5);*/ /*µÆ»·ºôÎüµÆ¿ØÖÆ*/
 }

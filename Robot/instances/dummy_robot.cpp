@@ -413,12 +413,12 @@ uint32_t DummyRobot::CommandHandler::ParseCommand(const std::string &_cmd)
     {
         case COMMAND_TARGET_POINT_SEQUENTIAL:
         case COMMAND_CONTINUES_TRAJECTORY:
-            if (_cmd[0] == '>')
+            if (_cmd[0] == '&'/*'>'*/) /*Modify by zhbi98*/
             {
                 float joints[6];
                 float speed;
 
-                argNum = sscanf(_cmd.c_str(), ">%f,%f,%f,%f,%f,%f,%f", joints, joints + 1, joints + 2,
+                argNum = sscanf(_cmd.c_str(), "&%f,%f,%f,%f,%f,%f,%f", joints, joints + 1, joints + 2,
                                 joints + 3, joints + 4, joints + 5, &speed);
                 if (argNum == 6)
                 {
@@ -436,7 +436,7 @@ uint32_t DummyRobot::CommandHandler::ParseCommand(const std::string &_cmd)
                 while (context->IsMoving() && context->IsEnabled())
                     osDelay(5);
                 Respond(*usbStreamOutputPtr, "ok");
-                Respond(*uart4StreamOutputPtr, "ok");
+                Respond(*uart2StreamOutputPtr, "ok");
             } else if (_cmd[0] == '@')
             {
                 float pose[6];
@@ -458,18 +458,18 @@ uint32_t DummyRobot::CommandHandler::ParseCommand(const std::string &_cmd)
                 while (context->IsMoving())
                     osDelay(5);
                 Respond(*usbStreamOutputPtr, "ok");
-                Respond(*uart4StreamOutputPtr, "ok");
+                Respond(*uart2StreamOutputPtr, "ok");
             }
 
             break;
 
         case COMMAND_TARGET_POINT_INTERRUPTABLE:
-            if (_cmd[0] == '>')
+            if (_cmd[0] == '&'/*'>'*/) /*Modify by zhbi98*/
             {
                 float joints[6];
                 float speed;
 
-                argNum = sscanf(_cmd.c_str(), ">%f,%f,%f,%f,%f,%f,%f", joints, joints + 1, joints + 2,
+                argNum = sscanf(_cmd.c_str(), "&%f,%f,%f,%f,%f,%f,%f", joints, joints + 1, joints + 2,
                                 joints + 3, joints + 4, joints + 5, &speed);
                 if (argNum == 6)
                 {
@@ -482,7 +482,7 @@ uint32_t DummyRobot::CommandHandler::ParseCommand(const std::string &_cmd)
                                    joints[3], joints[4], joints[5]);
                 }
                 Respond(*usbStreamOutputPtr, "ok");
-                Respond(*uart4StreamOutputPtr, "ok");
+                Respond(*uart2StreamOutputPtr, "ok");
             } else if (_cmd[0] == '@')
             {
                 float pose[6];
@@ -499,7 +499,7 @@ uint32_t DummyRobot::CommandHandler::ParseCommand(const std::string &_cmd)
                     context->MoveL(pose[0], pose[1], pose[2], pose[3], pose[4], pose[5]);
                 }
                 Respond(*usbStreamOutputPtr, "ok");
-                Respond(*uart4StreamOutputPtr, "ok");
+                Respond(*uart2StreamOutputPtr, "ok");
             }
             break;
 
