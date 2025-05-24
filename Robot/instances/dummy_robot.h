@@ -105,7 +105,8 @@ public:
 
 
     // This is the pose when power on.
-    const DOF6Kinematic::Joint6D_t REST_POSE = {0, -73, 180, 0, 0, 0};
+    /*const DOF6Kinematic::Joint6D_t REST_POSE = {0, -73, 180, 0, 0, 0};*/
+    const DOF6Kinematic::Joint6D_t REST_POSE = {0, -83, 180, 0, 0, 0};
     const float DEFAULT_JOINT_SPEED = 30;  // degree/s
     const DOF6Kinematic::Joint6D_t DEFAULT_JOINT_ACCELERATION_BASES = {150, 100, 200, 200, 200, 200};
     const float DEFAULT_JOINT_ACCELERATION_LOW = 30;    // 0~100
