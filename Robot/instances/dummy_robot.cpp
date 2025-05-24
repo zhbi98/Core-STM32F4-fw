@@ -20,16 +20,26 @@ inline float AbsMaxOf6(DOF6Kinematic::Joint6D_t _joints, uint8_t &_index)
 DummyRobot::DummyRobot(CAN_HandleTypeDef* _hcan) :
     hcan(_hcan)
 {
-    motorJ[ALL] = new CtrlStepMotor(_hcan, 0, false, 1, -180, 180);
+    /*motorJ[ALL] = new CtrlStepMotor(_hcan, 0, false, 1, -180, 180);
     motorJ[1] = new CtrlStepMotor(_hcan, 1, true, 50, -170, 170);
     motorJ[2] = new CtrlStepMotor(_hcan, 2, false, 30, -73, 90);
     motorJ[3] = new CtrlStepMotor(_hcan, 3, true, 30, 35, 180);
     motorJ[4] = new CtrlStepMotor(_hcan, 4, false, 24, -180, 180);
     motorJ[5] = new CtrlStepMotor(_hcan, 5, true, 30, -120, 120);
     motorJ[6] = new CtrlStepMotor(_hcan, 6, true, 50, -720, 720);
-    hand = new DummyHand(_hcan, 7);
+    hand = new DummyHand(_hcan, 7);*/
 
-    dof6Solver = new DOF6Kinematic(0.109f, 0.035f, 0.146f, 0.115f, 0.052f, 0.072f);
+    motorJ[ALL] = new CtrlStepMotor(_hcan, 0, false, 1, -180, 180);
+    motorJ[1] = new CtrlStepMotor(_hcan, 1, true, 30, -170, 170);
+    motorJ[2] = new CtrlStepMotor(_hcan, 2, true, 30, -83, 90);
+    motorJ[3] = new CtrlStepMotor(_hcan, 3, true, 30, 40, 180);
+    motorJ[4] = new CtrlStepMotor(_hcan, 4, false, 30, -180, 180);
+    motorJ[5] = new CtrlStepMotor(_hcan, 5, true, 30, -120, 120);
+    motorJ[6] = new CtrlStepMotor(_hcan, 6, true, 30, -720, 720);
+    hand = new DummyHand(_hcan, 7);
+    
+    /*dof6Solver = new DOF6Kinematic(0.109f, 0.035f, 0.146f, 0.115f, 0.052f, 0.072f);*/
+    dof6Solver = new DOF6Kinematic(0.149f, 0.036f, 0.188f, 0.152f, 0.0762f, 0.110f);
 }
 
 
@@ -220,12 +230,15 @@ void DummyRobot::CalibrateHomeOffset()
     osDelay(500);
 
     // 4.Apply Home-Offset the second time
-    motorJ[ALL]->ApplyPositionAsHome();
+    /*motorJ[ALL]->ApplyPositionAsHome();*/
     osDelay(500);
     motorJ[2]->SetCurrentLimit(1);
     motorJ[3]->SetCurrentLimit(1);
     osDelay(500);
 
+    motorJ[ALL]->SetEnable(false);
+    osDelay(1500);
+    
     Reboot();
 }
 
