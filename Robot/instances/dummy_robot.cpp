@@ -176,6 +176,8 @@ void DummyRobot::UpdateJointAngles()
 
 void DummyRobot::UpdateJointAnglesCallback()
 {
+    /**motorJ[i]->angle：电机当前位置（以ApplyPositionAsHome后为零点）*/
+    /**initPose.a[i - 1]：软件定义的零点偏移*/
     for (int i = 1; i <= 6; i++)
     {
         currentJoints.a[i - 1] = motorJ[i]->angle + initPose.a[i - 1];
@@ -185,6 +187,16 @@ void DummyRobot::UpdateJointAnglesCallback()
         else
             jointsStateFlag &= ~(1 << i);
     }
+
+    /*ApplyPositionAsHome 后，电机角度是 0，但你希望 “休息位” 在运动学上是(0,0,90,0,0,0)。*/
+    /*所以你用 initPose 把第三轴加上 90 度，这样 currentJoints 
+    反映的就是 “运动学零点”，而不是电机的物理零点。*/
+    /*这也是为什么CalibrateHomeOffset在各个关节的角度设置为 0 
+    度后 J3 的角度会是 90 度*/
+
+    /*这样可以灵活定义“休息位”或“标准位”在运动学上的
+    角度（比如第三轴90度），而不用强制让电机物理零点和运动学零点重合。
+    方便和机械臂的实际结构、运动学模型对齐。*/
 }
 
 
@@ -224,9 +236,13 @@ void DummyRobot::CalibrateHomeOffset()
     osDelay(500);
 
     // 3.Go to Resting-Pose
+    /*MoveJoints 函数，以及运动学计算需要参考该结构体位置参数（initPose），所以需要更新，
+    因为这里是手动操作的，所以这里也手动更新该位置参数*/
     initPose = DOF6Kinematic::Joint6D_t(0, 0, 90, 0, 0, 0);
+    /*运动学计算需要使用的当前位置参数（currentJoints），所以需要更新，
+    因为这里是手动操作的，所以这里也手动更新该位置参数*/
     currentJoints = DOF6Kinematic::Joint6D_t(0, 0, 90, 0, 0, 0);
-    Resting();
+    Resting(); /*前面这些位置更新后，机械臂才知道如何运动到休眠默认态*/
     osDelay(500);
 
     // 4.Apply Home-Offset the second time

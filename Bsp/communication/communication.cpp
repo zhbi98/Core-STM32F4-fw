@@ -83,7 +83,7 @@ int _write(int file, const char* data, int len);
 int _write(int file, const char* data, int len)
 {
     usbStreamOutputPtr->process_bytes((const uint8_t*) data, len, nullptr);
-    uart4StreamOutputPtr->process_bytes((const uint8_t*) data, len, nullptr);
+    uart2StreamOutputPtr->process_bytes((const uint8_t*) data, len, nullptr);
 
     return len;
 }

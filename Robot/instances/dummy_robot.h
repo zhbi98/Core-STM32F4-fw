@@ -104,7 +104,7 @@ public:
     TuningHelper tuningHelper = TuningHelper(this);
 
 
-    // This is the pose when power on.
+    // This is the pose when power on. 上电启动默认姿势: REST_POSE，注意机械臂上电时一定要在这个姿态（这个姿态可以理解为机械0点）。
     /*const DOF6Kinematic::Joint6D_t REST_POSE = {0, -73, 180, 0, 0, 0};*/
     const DOF6Kinematic::Joint6D_t REST_POSE = {0, -83, 180, 0, 0, 0};
     const float DEFAULT_JOINT_SPEED = 30;  // degree/s

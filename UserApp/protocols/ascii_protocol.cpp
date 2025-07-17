@@ -56,7 +56,7 @@ void OnUsbAsciiCmd(const char* _cmd, size_t _len, StreamSink &_responseChannel)
 }
 
 
-void OnUart4AsciiCmd(const char* _cmd, size_t _len, StreamSink &_responseChannel)
+void OnUart2AsciiCmd(const char* _cmd, size_t _len, StreamSink &_responseChannel)
 {
     /*---------------------------- ↓ Add Your CMDs Here ↓ -----------------------------*/
     if (_cmd[0] == '!' || !dummy.IsEnabled())
@@ -108,7 +108,7 @@ void OnUart4AsciiCmd(const char* _cmd, size_t _len, StreamSink &_responseChannel
 }
 
 
-void OnUart2AsciiCmd(const char* _cmd, size_t _len, StreamSink &_responseChannel)
+void OnUart4AsciiCmd(const char* _cmd, size_t _len, StreamSink &_responseChannel)
 {
     /*---------------------------- ↓ Add Your CMDs Here ↓ -----------------------------*/
 
