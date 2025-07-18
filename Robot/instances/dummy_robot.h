@@ -104,7 +104,7 @@ public:
     TuningHelper tuningHelper = TuningHelper(this);
 
 
-    // This is the pose when power on. ÉÏµçÆô¶¯Ä¬ÈÏ×ËÊÆ: REST_POSE£¬×¢Òâ»úĞµ±ÛÉÏµçÊ±Ò»¶¨ÒªÔÚÕâ¸ö×ËÌ¬£¨Õâ¸ö×ËÌ¬¿ÉÒÔÀí½âÎª»úĞµ0µã£©¡£
+    // This is the pose when power on. ä¸Šç”µå¯åŠ¨é»˜è®¤å§¿åŠ¿: REST_POSEï¼Œæ³¨æ„æœºæ¢°è‡‚ä¸Šç”µæ—¶ä¸€å®šè¦åœ¨è¿™ä¸ªå§¿æ€ï¼ˆè¿™ä¸ªå§¿æ€å¯ä»¥ç†è§£ä¸ºæœºæ¢°0ç‚¹ï¼‰ï¼Œæ‰‹åŠ¨åŠ¨å¤ä½åˆ°æ”¶ç¼©æ€ï¼Œå†ä¸Šç”µï¼Œæ¥å›é›¶æ ¡å‡†ã€‚
     /*const DOF6Kinematic::Joint6D_t REST_POSE = {0, -73, 180, 0, 0, 0};*/
     const DOF6Kinematic::Joint6D_t REST_POSE = {0, -83, 180, 0, 0, 0};
     const float DEFAULT_JOINT_SPEED = 30;  // degree/s
