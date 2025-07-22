@@ -243,11 +243,11 @@ void DummyRobot::CalibrateHomeOffset()
     因为这里是手动操作的，所以这里也手动更新该位置参数*/
     currentJoints = DOF6Kinematic::Joint6D_t(0, 0, 90, 0, 0, 0);
     Resting(); /*前面这些位置更新后，机械臂才知道如何运动到休眠默认态*/
-    osDelay(500);
+    osDelay(500 * 35);
 
     // 4.Apply Home-Offset the second time
     motorJ[ALL]->ApplyPositionAsHome(); /*两次是为了在不同形态下校准提高精度的*/
-    osDelay(500);
+    osDelay(500 * 5);
     motorJ[2]->SetCurrentLimit(3.0);
     motorJ[3]->SetCurrentLimit(3.0);
     osDelay(500);
