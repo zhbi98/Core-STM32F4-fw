@@ -6,7 +6,7 @@ extern DummyRobot dummy;
 void OnUsbAsciiCmd(const char* _cmd, size_t _len, StreamSink &_responseChannel)
 {
     /*---------------------------- ↓ Add Your CMDs Here ↓ -----------------------------*/
-    if (_cmd[0] == '!' || !dummy.IsEnabled())
+    if (_cmd[0] == '!'/* || !dummy.IsEnabled()*/)
     {
         std::string s(_cmd);
         if (s.find("STOP") != std::string::npos)
@@ -59,7 +59,7 @@ void OnUsbAsciiCmd(const char* _cmd, size_t _len, StreamSink &_responseChannel)
 void OnUart2AsciiCmd(const char* _cmd, size_t _len, StreamSink &_responseChannel)
 {
     /*---------------------------- ↓ Add Your CMDs Here ↓ -----------------------------*/
-    if (_cmd[0] == '!' || !dummy.IsEnabled())
+    if (_cmd[0] == '!'/* || !dummy.IsEnabled()*/)
     {
         std::string s(_cmd);
         if (s.find("STOP") != std::string::npos)

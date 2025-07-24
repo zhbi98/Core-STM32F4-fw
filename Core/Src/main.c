@@ -128,8 +128,8 @@ int main(void)
   MX_UART4_Init();
   MX_ADC1_Init();
   MX_UART5_Init();
-  /*MX_TIM2_Init();*/ /*µÆ»·ºôÎüµÆ¿ØÖÆ*/
-  /*MX_TIM3_Init();*/ /*µÆ»·ºôÎüµÆ¿ØÖÆ*/
+  /*MX_TIM2_Init();*/ /*ç¯çŽ¯å‘¼å¸ç¯æŽ§åˆ¶*/
+  /*MX_TIM3_Init();*/ /*ç¯çŽ¯å‘¼å¸ç¯æŽ§åˆ¶*/
   /* USER CODE BEGIN 2 */
 
   /* USER CODE END 2 */

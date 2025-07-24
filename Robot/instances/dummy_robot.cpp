@@ -170,7 +170,19 @@ bool DummyRobot::MoveL(float _x, float _y, float _z, float _a, float _b, float _
 
 void DummyRobot::UpdateJointAngles()
 {
-    motorJ[ALL]->UpdateAngle();
+    /*广播获取所有关节角度的方式 (ALL节点) 下，部分关节电机 (J2, J3) 反馈可能丢失或主控处理不及时，
+    导致角度间歇性不更新，所以这里采用点对点方式 (单独节点) 来稳定获取反馈。*/
+
+    /*motorJ[ALL]->UpdateAngle();*/
+
+    for (int j = 1; j <= 6; j++)
+    {
+        motorJ[j]->UpdateAngle();
+        osDelay(2);
+    }
+
+    /*广播请求后，所有电机节点可能几乎同时回复，容易造成总线冲突或部分节点因仲裁失败而丢包。
+    如果多个节点同时发送，只有优先级高的报文能成功发送，其他报文会延迟或丢失。*/
 }
 
 
