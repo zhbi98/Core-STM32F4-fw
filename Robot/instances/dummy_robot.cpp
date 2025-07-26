@@ -70,6 +70,8 @@ void DummyRobot::Reboot()
 
 void DummyRobot::MoveJoints(DOF6Kinematic::Joint6D_t _joints)
 {
+    /*Current angle = Motor Angle + initial angle*/
+    /*Motor Angle = Current angle - initial angle*/
     for (int j = 1; j <= 6; j++)
     {
         motorJ[j]->SetAngleWithVelocityLimit(_joints.a[j - 1] - initPose.a[j - 1],
@@ -192,6 +194,8 @@ void DummyRobot::UpdateJointAnglesCallback()
     /**initPose.a[i - 1]：软件定义的零点偏移*/
     for (int i = 1; i <= 6; i++)
     {
+        /*Current angle = Motor Angle + initial angle*/
+        /*Motor Angle = Current angle - initial angle*/
         currentJoints.a[i - 1] = motorJ[i]->angle + initPose.a[i - 1];
 
         if (motorJ[i]->state == CtrlStepMotor::FINISH)
