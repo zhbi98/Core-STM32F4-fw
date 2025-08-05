@@ -114,7 +114,7 @@ void ThreadOledUpdate(void* argument)
 
         oled.sendBuffer();
 
-        /**·ÀÖ¹ STM32 Ó²¼ş I2C I2C_WaitOnMasterAddressFlagUntilTimeout ËÀËøÔÚ BUSY ×´Ì¬*/
+        /**é˜²æ­¢ STM32 ç¡¬ä»¶ I2C I2C_WaitOnMasterAddressFlagUntilTimeout æ­»é”åœ¨ BUSY çŠ¶æ€*/
         vTaskDelay(10);
     }
 }
@@ -150,7 +150,7 @@ void Main(void)
 
     // Init OLED 128x80.
     oled.Init();
-    /*pwm.Start();*/ /*µÆ»·ºôÎüµÆ¿ØÖÆ*/
+    /*pwm.Start();*/ /*ç¯ç¯å‘¼å¸ç¯æ§åˆ¶*/
 
     // Init & Run User Threads.
     const osThreadAttr_t controlLoopTask_attributes = {
@@ -182,5 +182,5 @@ void Main(void)
 
     // System started, light switch-led up.
     Respond(*uart2StreamOutputPtr, "[sys] Heap remain: %d Bytes\n", xPortGetMinimumEverFreeHeapSize());
-    /*pwm.SetDuty(PWM::CH_A1, 0.5);*/ /*µÆ»·ºôÎüµÆ¿ØÖÆ*/
+    /*pwm.SetDuty(PWM::CH_A1, 0.5);*/ /*ç¯ç¯å‘¼å¸ç¯æ§åˆ¶*/
 }

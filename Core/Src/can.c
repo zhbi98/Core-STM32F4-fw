@@ -31,6 +31,10 @@ CAN_HandleTypeDef hcan2;
 void MX_CAN1_Init(void)
 {
 
+  /*注意：初始化 CAN 控制器时，如果没有正确或没有接入外部 CAN 收发器，
+  初始化过程将卡死。此时需要将 CAN 模式设置为内部回环模式，
+  或正确接入 CAN 收发器*/
+
   /* USER CODE BEGIN CAN1_Init 0 */
 
   /* USER CODE END CAN1_Init 0 */
@@ -62,6 +66,10 @@ void MX_CAN1_Init(void)
 /* CAN2 init function */
 void MX_CAN2_Init(void)
 {
+
+  /*注意：初始化 CAN 控制器时，如果没有正确或没有接入外部 CAN 收发器，
+  初始化过程将卡死。此时需要将 CAN 模式设置为内部回环模式，
+  或正确接入 CAN 收发器*/
 
   /* USER CODE BEGIN CAN2_Init 0 */
 

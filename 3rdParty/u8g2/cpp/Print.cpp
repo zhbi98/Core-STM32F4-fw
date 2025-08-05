@@ -359,3 +359,211 @@ size_t Print::printFloat(double number, uint8_t digits)
 
     return n;
 }
+
+extern "C" char * mini_itoa_10(int val, 
+    char * buf_p, size_t * len_p)
+{
+  char str[12] = {0}; /* 支持 32 位有符号数*/
+  size_t i = 0;
+  int neg = 0;
+
+  if (val == 0) str[i++] = '0';
+  else {
+    if (val < 0) {
+      neg = 1;
+      val = -val;
+    }
+    while (val > 0) {
+      str[i++] = '0' + (val % 10);
+      val /= 10;
+    }
+  }
+
+  *len_p = i + (neg ? 1 : 0);
+  char * dest_p = buf_p;
+
+  if (neg) *dest_p++ = '-';
+
+  while (i > 0) {
+    *dest_p++ = str[--i];
+  }
+  return dest_p;
+}
+
+extern "C" char * mini_itoa_16(unsigned int val, 
+    char * buf_p, size_t * len_p)
+{
+  const char hex[] = "0123456789abcdef";
+  char tmp[9] = {0};
+  size_t i = 0;
+
+  if (val == 0) tmp[i++] = '0';
+  else {
+    while (val > 0) {
+      tmp[i++] = hex[val & 0xf];
+      val >>= 4;
+    }
+  }
+
+  *len_p = i;
+  char * dest_p = buf_p;
+
+  while (i > 0) {
+    *dest_p++ = tmp[--i];
+  }
+  return dest_p;
+}
+
+extern "C" int mini_vsnprintf(char * buf, size_t size, 
+    const char * fmt, va_list args) 
+{
+  size_t remain = (size > 0) ? size - 1 : 0; /*留一个给 '\0' 符号*/
+  const char *fmt_p = fmt;
+  char * dest_p = buf;
+
+  while (*fmt_p) {
+    if (*fmt_p != '%') {
+      if (remain > 0) {
+        *dest_p++ = *fmt_p;
+        remain--;
+      }
+    } else {
+      fmt_p++;
+      char pad = ' ';  /*默认填充*/
+      int width = 0;
+
+      /*解析宽度（简单支持 %5d）*/
+      while (*fmt_p >= '0' && *fmt_p <= '9') {
+        width = width * 10 + (*fmt_p - '0');
+        fmt_p++;
+      }
+
+      char * end_p = NULL;
+      size_t len = 0;
+
+      switch (*fmt_p) {
+      case 'd':
+      {
+        len = 0;
+        int val = va_arg(args, int);
+        end_p = mini_itoa_10(val, dest_p, &len);
+
+        /*处理宽度填充*/
+        while (len < (size_t)width && remain > 0) {
+          memmove(dest_p + 1, dest_p, end_p - dest_p);
+          *dest_p = pad;
+          end_p++;
+          len++;
+          remain--;
+        }
+
+        dest_p = end_p;
+        remain = (
+          remain >= (end_p - dest_p)
+        ) ? remain - (end_p - dest_p) : 0;
+      }
+        break;
+
+      case 'x':
+      {
+        len = 0;
+        unsigned int val = va_arg(args, unsigned int);
+        end_p = mini_itoa_16(val, dest_p, &len);
+
+        while (len < (size_t)width && remain > 0) {
+          memmove(dest_p + 1, dest_p, end_p - dest_p);
+          *dest_p = pad;
+          end_p++;
+          remain--;
+        }
+
+        dest_p = end_p;
+        remain = (
+          remain >= (end_p - dest_p)
+        ) ? remain - (end_p - dest_p) : 0;
+      }
+        break;
+
+      case 's':
+      {
+        const char *str = va_arg(args, const char *);
+        if (!str) str = "(null)";
+        len = strlen(str);
+
+        /*宽度填充（左对齐暂不支持）*/
+        while (len < (size_t)width && remain > 0) {
+          *dest_p++ = pad;
+          width--;
+          remain--;
+        }
+
+        /*复制字符串*/
+        for (size_t i = 0; i < len && 
+            remain > 0; i++) {
+          *dest_p++ = str[i];
+          remain--;
+        }
+      }
+        break;
+
+      case 'c':
+      {
+        char c = (char)va_arg(args, int);
+        if (remain > 0) {
+          *dest_p++ = c;
+          remain--;
+        }
+      }
+        break;
+
+      case 'p':
+      {
+        void * arg_p = va_arg(args, void *);
+        unsigned long val = (unsigned long)arg_p;
+        if (remain > 0) {
+          *dest_p++ = '0'; remain--;
+          if (remain > 0) { 
+            *dest_p++ = 'x';
+            remain--; 
+          }
+        }
+        len = 0;
+        end_p = mini_itoa_16(val, dest_p, &len);
+        dest_p = end_p;
+        remain = (
+          remain >= (end_p - dest_p)
+        ) ? remain - (end_p - dest_p) : 0;
+      }
+        break;
+
+      case '%':
+      {
+        if (remain > 0) {
+          *dest_p++ = '%';
+          remain--;
+        }
+      }
+        break;
+
+      default:
+      {
+        if (remain > 0) {
+          *dest_p++ = '%';
+          remain--;
+        }
+        if (remain > 0) {
+          *dest_p++ = *fmt_p;
+          remain--;
+        }
+      }
+        break;
+      }
+    }
+    fmt_p++;
+  }
+
+  /*确保结尾为 '\0' 符号*/
+  if (size > 0) *dest_p = '\0';
+  /*返回总长度（不依赖 size）*/
+  return (int)(dest_p - buf);
+}

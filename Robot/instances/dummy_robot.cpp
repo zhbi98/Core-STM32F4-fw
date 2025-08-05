@@ -31,7 +31,7 @@ DummyRobot::DummyRobot(CAN_HandleTypeDef* _hcan) :
 
     motorJ[ALL] = new CtrlStepMotor(_hcan, 0, false, 1, -180, 180);
     motorJ[1] = new CtrlStepMotor(_hcan, 1, true, 30, -170, 170);
-    motorJ[2] = new CtrlStepMotor(_hcan, 2, true, 30, -83, 90);
+    motorJ[2] = new CtrlStepMotor(_hcan, 2, true, 50, -83, 90);
     motorJ[3] = new CtrlStepMotor(_hcan, 3, true, 30, 40, 180);
     motorJ[4] = new CtrlStepMotor(_hcan, 4, false, 30, -180, 180);
     motorJ[5] = new CtrlStepMotor(_hcan, 5, true, 30, -120, 120);
