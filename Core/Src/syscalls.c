@@ -13,7 +13,7 @@
 **
 **  Target      : STMicroelectronics STM32
 **
-**  Distribution: The file is distributed ��as is,�� without any warranty
+**  Distribution: The file is distributed “as is,” without any warranty
 **                of any kind.
 **
 *****************************************************************************
@@ -114,20 +114,23 @@ __attribute__((weak)) int _write(int file, char *ptr, int len)
 	return len;
 }
 
+extern char _end; /*在链接脚本中被定义*/
+extern char _estack;  /*在链接脚本中被定义*/
+
 caddr_t _sbrk(int incr)
 {
-	extern char end asm("end");
+	/*extern char end asm("end");*/
 	static char *heap_end;
 	char *prev_heap_end;
 
 	if (heap_end == 0)
-		heap_end = &end;
+		heap_end = &_end;
 
 	prev_heap_end = heap_end;
-	if (heap_end + incr > stack_ptr)
+	if (heap_end + incr > &_estack)
 	{
-//		write(1, "Heap and stack collision\n", 25);
-//		abort();
+		/*write(1, "Heap and stack collision\n", 25);*/
+		/*abort();*/
 		errno = ENOMEM;
 		return (caddr_t) -1;
 	}
