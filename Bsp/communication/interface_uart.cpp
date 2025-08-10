@@ -118,6 +118,11 @@ static void UartServerTask(void* ctx)
         }
         // Fetch the circular buffer "write pointer", where it would write next
         uint32_t new_rcv_idx = UART_RX_BUFFER_SIZE - huart4.hdmarx->Instance->NDTR;
+        /**
+         * NDTR（Number of Data to Transfer Register）是 DMA 的计数器（递减计数器），从缓冲区大小递减到 0。
+         * 当调用 HAL_UART_Receive_DMA() 时，HAL 库会设置 NDTR = UART_RX_BUFFER_SIZE。
+         * 启动 DMA，NDTR 随着每个字节接收而递减。
+         */
 
         // deadline_ms = timeout_to_deadline(PROTOCOL_SERVER_TIMEOUT_MS);
         // Process bytes in one or two chunks (two in case there was a wrap)
@@ -149,6 +154,11 @@ static void UartServerTask(void* ctx)
         }
         // Fetch the circular buffer "write pointer", where it would write next
         new_rcv_idx = UART_RX_BUFFER_SIZE - huart2.hdmarx->Instance->NDTR;
+        /**
+         * NDTR（Number of Data to Transfer Register）是 DMA 的计数器（递减计数器），从缓冲区大小递减到 0。
+         * 当调用 HAL_UART_Receive_DMA() 时，HAL 库会设置 NDTR = UART_RX_BUFFER_SIZE。
+         * 启动 DMA，NDTR 随着每个字节接收而递减。
+         */
 
         // deadline_ms = timeout_to_deadline(PROTOCOL_SERVER_TIMEOUT_MS);
         // Process bytes in one or two chunks (two in case there was a wrap)
