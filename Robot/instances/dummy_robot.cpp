@@ -63,7 +63,7 @@ void DummyRobot::Init()
 void DummyRobot::Reboot()
 {
     motorJ[ALL]->Reboot();
-    osDelay(500); // waiting for all joints done
+    osDelay(500 * 10); // waiting for all joints done
     HAL_NVIC_SystemReset();
 }
 
@@ -234,7 +234,13 @@ void DummyRobot::SetJointAcceleration(float _acc)
         motorJ[i]->SetAcceleration(_acc / 100 * DEFAULT_JOINT_ACCELERATION_BASES.a[i - 1]);
 }
 
-
+/**
+ * @brief Calibrate the mechanical reference zero point of the robotic arm.
+ * 注意直接在 Resting 态执行校准 Resting() 函数存在卡死情况（在 Resting 态执行校准可移除 Resting 函数）。
+ * 因为虽然机械本身处于 Resting 态，但运动学角度处于 L-Pose 态，此时依旧会控制关节运动，
+ * 但是关节处于限位状态无法运动，导致电机堵转，IsMoving() 无法结束，从而 Resting() 函数卡死。
+ * 所以最好还是在 L-Pose 态执行校准。
+ */
 void DummyRobot::CalibrateHomeOffset()
 {
     // Disable FixUpdate, but not disable motors
@@ -243,26 +249,34 @@ void DummyRobot::CalibrateHomeOffset()
 
     // 1.Manually move joints to L-Pose [precisely]
     // ...
-    motorJ[2]->SetCurrentLimit(0.5);
-    motorJ[3]->SetCurrentLimit(0.5);
+    motorJ[2]->SetCurrentLimit(0.3);
+    motorJ[3]->SetCurrentLimit(0.3);
     osDelay(500);
 
     // 2.Apply Home-Offset the first time
-    motorJ[ALL]->ApplyPositionAsHome();
+    motorJ[ALL]->ApplyPositionAsHome(); /*第一次为了让零点和 L-Pose 对应，为 Resting() 运动做准备*/
     osDelay(500);
 
     // 3.Go to Resting-Pose
     /*MoveJoints 函数，以及运动学计算需要参考该结构体位置参数（initPose），所以需要更新，
     因为这里是手动操作的，所以这里也手动更新该位置参数*/
-    initPose = DOF6Kinematic::Joint6D_t(0, 0, 90, 0, 0, 0);
+    /*initPose = DOF6Kinematic::Joint6D_t(0, 0, 90, 0, 0, 0);*/
+    initPose = DOF6Kinematic::Joint6D_t(0, -83, 180, 0, 0, 0);
     /*运动学计算需要使用的当前位置参数（currentJoints），所以需要更新，
     因为这里是手动操作的，所以这里也手动更新该位置参数*/
-    currentJoints = DOF6Kinematic::Joint6D_t(0, 0, 90, 0, 0, 0);
+    /*currentJoints = DOF6Kinematic::Joint6D_t(0, 0, 90, 0, 0, 0);*/
+    currentJoints = DOF6Kinematic::Joint6D_t(0, -83, 180, 0, 0, 0);
     Resting(); /*前面这些位置更新后，机械臂才知道如何运动到休眠默认态*/
-    osDelay(500 * 35);
+    osDelay(500 * 10);
+
+    /**关闭电机，依靠重力自动回到精确的 Resting 位置，Add by zhbi98
+   （这样可以不要求精确摆放 L-Pose 位置）*/
+    motorJ[2]->SetEnable(false);
+    motorJ[3]->SetEnable(false);
+    osDelay(500 * 10);
 
     // 4.Apply Home-Offset the second time
-    motorJ[ALL]->ApplyPositionAsHome(); /*两次是为了在不同形态下校准提高精度的*/
+    motorJ[ALL]->ApplyPositionAsHome(); /*第二次为真正的零点*/
     osDelay(500 * 5);
     motorJ[2]->SetCurrentLimit(3.0);
     motorJ[3]->SetCurrentLimit(3.0);
@@ -278,12 +292,17 @@ void DummyRobot::CalibrateHomeOffset()
 void DummyRobot::Homing()
 {
     float lastSpeed = jointSpeed;
+    uint16_t _tim = 0;
     SetJointSpeed(10);
 
     MoveJ(0, 0, 90, 0, 0, 0);
     MoveJoints(targetJoints);
-    while (IsMoving())
+    while (IsMoving()) {
+        /*200 * 500us / 10us = 10000*/
+        if (_tim > 10000) break;
         osDelay(10);
+        _tim++;
+    }
 
     SetJointSpeed(lastSpeed);
 }
@@ -292,13 +311,18 @@ void DummyRobot::Homing()
 void DummyRobot::Resting()
 {
     float lastSpeed = jointSpeed;
+    uint16_t _tim = 0;
     SetJointSpeed(10);
 
     MoveJ(REST_POSE.a[0], REST_POSE.a[1], REST_POSE.a[2],
           REST_POSE.a[3], REST_POSE.a[4], REST_POSE.a[5]);
     MoveJoints(targetJoints);
-    while (IsMoving())
+    while (IsMoving()) {
+        /*200 * 500us / 10us = 10000*/
+        if (_tim > 10000) break;
         osDelay(10);
+        _tim++;
+    }
 
     SetJointSpeed(lastSpeed);
 }

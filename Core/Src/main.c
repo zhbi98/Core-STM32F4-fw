@@ -239,6 +239,29 @@ void Error_Handler(void)
   /* USER CODE END Error_Handler_Debug */
 }
 
+#include <stdio.h>
+#include <stdarg.h>
+
+/**
+  * @brief  Write formatted output to stdout from the format string FORMAT. VARARGS1.
+  * @retval None
+  */
+int __fputs(const char * format, ...)
+{
+  uint8_t loc_buf[128] = {0};
+  va_list arg;
+  int done;
+
+  va_start(arg, format);
+  done = vsnprintf(loc_buf, 128, format, arg);
+  va_end(arg);
+
+  HAL_UART_Transmit(&huart1, loc_buf, 
+    strlen(loc_buf), 0xFFFF);
+
+  return done;
+}
+
 #ifdef  USE_FULL_ASSERT
 /**
   * @brief  Reports the name of the source file and the source line number
